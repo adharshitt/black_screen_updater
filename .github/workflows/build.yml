@@ -1,0 +1,39 @@
+name: Flutter Build APK
+
+on:
+  push:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.24.0'
+          channel: 'stable'
+
+      - name: Generate Flutter Scaffold (if missing)
+        run: |
+          # We run flutter create to generate android/ios folders for compiling
+          flutter create --project-name auto_updater --org com.example.autoupdater .
+          # Restore the custom main.dart and pubspec.yaml that flutter create might overwrite
+          git restore lib/main.dart pubspec.yaml || true
+          
+      - name: Install Dependencies
+        run: flutter pub get
+
+      - name: Build APK
+        run: flutter build apk --release
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-release
+          path: build/app/outputs/flutter-apk/app-release.apk
