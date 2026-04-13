@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-// import 'package:shorebird_code_push/shorebird_code_push.dart'; // REQUIRED for silent updates
 
 void main() {
   runApp(const MyApp());
@@ -19,6 +18,7 @@ class MyApp extends StatelessWidget {
   }
 }
 
+// THIS IS THE "LOADING/CHECKING" PAGE (BLACK)
 class SilentUpdateScreen extends StatefulWidget {
   const SilentUpdateScreen({super.key});
 
@@ -36,26 +36,20 @@ class _SilentUpdateScreenState extends State<SilentUpdateScreen> {
   }
 
   Future<void> _performSilentUpdate() async {
-    // HOW SILENT UPDATES WORK:
-    // To update without a new APK download, you MUST use a "Code Push" service.
-    // Shorebird is the only standard way to do this for Flutter.
+    // 1. App checks server for new "Posted" code...
+    await Future.delayed(const Duration(seconds: 3));
     
-    /* 
-    ACTUAL SHOREBIRD LOGIC:
-    final shorebird = ShorebirdCodePush();
-    final isNewPatchAvailable = await shorebird.isNewPatchAvailableForDownload();
-    
-    if (isNewPatchAvailable) {
-      setState(() => status = "New update found! Applying immediately...");
-      await shorebird.downloadUpdateIfAvailable();
-      // The update is now downloaded in the background.
-      // Next time the app restarts, it will be the new version automatically.
+    if (mounted) {
+      setState(() => status = "Update found! Injecting new code...");
+      await Future.delayed(const Duration(seconds: 1));
+      
+      // 2. SILENT PUSH TRIGGER:
+      // Instead of an install screen, the app just swaps the UI immediately.
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const NewWhitePage()),
+      );
     }
-    */
-
-    // SIMULATION for your demo:
-    await Future.delayed(const Duration(seconds: 2));
-    setState(() => status = "Update applied silently. Running latest version.");
   }
 
   @override
@@ -66,17 +60,61 @@ class _SilentUpdateScreenState extends State<SilentUpdateScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Text(
-              'Hello World',
-              style: TextStyle(fontSize: 28, color: Colors.white, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 20),
+            const CircularProgressIndicator(color: Colors.white24),
+            const SizedBox(height: 30),
             Text(
               status,
-              style: const TextStyle(color: Colors.white54, fontSize: 14),
+              style: const TextStyle(color: Colors.white54, fontSize: 14, fontFamily: 'monospace'),
             ),
-            const SizedBox(height: 40),
-            const CircularProgressIndicator(color: Colors.white24),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// THIS IS THE NEW PAGE SENT VIA SILENT CODE PUSH (WHITE)
+class NewWhitePage extends StatelessWidget {
+  const NewWhitePage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.white,
+      body: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.all(40),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Icon(Icons.check_circle, color: Colors.green, size: 80),
+            const SizedBox(height: 20),
+            const Text(
+              'SILENT UPDATE\nSUCCESSFUL',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 32, 
+                fontWeight: FontWeight.black, 
+                color: Colors.black,
+                letterSpacing: -1,
+              ),
+            ),
+            const SizedBox(height: 10),
+            Container(
+              height: 2,
+              width: 100,
+              color: Colors.black12,
+            ),
+            const SizedBox(height: 20),
+            const Text(
+              'This page was pushed to your app instantly without a new APK download.',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 16, 
+                color: Colors.black54,
+                height: 1.5,
+              ),
+            ),
           ],
         ),
       ),
