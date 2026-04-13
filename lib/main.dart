@@ -94,7 +94,7 @@ class NewWhitePage extends StatelessWidget {
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 32, 
-                fontWeight: FontWeight.black, 
+                fontWeight: FontWeight.w900, 
                 color: Colors.black,
                 letterSpacing: -1,
               ),
